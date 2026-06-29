@@ -1,0 +1,11 @@
+# Archivos generados durante la ejecución.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Registro local de eventos y errores.
+logs/*.log
+
+# Configuración local del entorno.
+.venv/
+.env
