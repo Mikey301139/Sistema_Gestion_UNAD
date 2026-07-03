@@ -12,7 +12,11 @@ from .services import EquipmentRentalService, RoomReservationService
 
 
 class SoftwareFJApp(tk.Tk):
-    """Ventana principal que delega las reglas de negocio al administrador."""
+    """Ventana principal que delega las reglas de negocio al administrador.
+
+    La interfaz solo captura datos y muestra resultados. Las reglas importantes
+    permanecen en las clases de dominio para mantener el programa modular.
+    """
 
     def __init__(self, manager: SoftwareFJManager) -> None:
         super().__init__()
@@ -25,6 +29,7 @@ class SoftwareFJApp(tk.Tk):
         self.refresh_all()
 
     def _build_interface(self) -> None:
+        """Construye las pestañas principales de la aplicación."""
         ttk.Label(self, text="Sistema Integral de Gestión - Software FJ", font=("Segoe UI", 18, "bold")).pack(anchor="w")
         ttk.Label(self, text="Gestión en memoria con validaciones, herencia, polimorfismo y registro de eventos.").pack(anchor="w", pady=(0, 10))
         self.tabs = ttk.Notebook(self)
@@ -76,6 +81,7 @@ class SoftwareFJApp(tk.Tk):
         ttk.Button(form, text="Crear servicio", command=self.add_service).grid(row=1, column=5, padx=8)
         self._update_service_detail_label()
         self.services_tree = self._tree(self.services_tab, ("Código", "Tipo", "Descripción", "Estado"), (110, 110, 520, 110))
+        ttk.Button(self.services_tab, text="Cambiar disponibilidad del servicio seleccionado", command=self.toggle_selected_service).pack(anchor="w")
 
     def _build_reservations(self) -> None:
         form = ttk.LabelFrame(self.reservations_tab, text="Crear reserva", padding=10)
@@ -100,7 +106,6 @@ class SoftwareFJApp(tk.Tk):
         actions = ttk.Frame(self.reservations_tab)
         actions.pack(fill="x", pady=8)
         ttk.Button(actions, text="Cancelar reserva seleccionada", command=self.cancel_selected_reservation).pack(side="left")
-        ttk.Button(actions, text="Cambiar disponibilidad del servicio", command=self.toggle_selected_service).pack(side="left", padx=8)
 
     def _tree(self, parent: ttk.Frame, columns: tuple[str, ...], widths: tuple[int, ...]) -> ttk.Treeview:
         container = ttk.Frame(parent)
@@ -129,13 +134,15 @@ class SoftwareFJApp(tk.Tk):
         self.reservation_parameter_label.config(text=text)
 
     def _number(self, value: str, field: str, integer: bool = False) -> float | int:
+        """Convierte entradas de texto y las reporta como errores de validación."""
         try:
             number = int(value) if integer else float(value)
-        except ValueError as error:
+        except (TypeError, ValueError) as error:
             raise ValidationError(f"{field} debe ser numérico.") from error
         return number
 
     def _run_operation(self, action, success: str) -> None:
+        """Ejecuta una acción de la interfaz sin permitir que un error cierre Tkinter."""
         try:
             action()
         except SoftwareFJError as error:
@@ -157,6 +164,7 @@ class SoftwareFJApp(tk.Tk):
 
         def operation() -> None:
             # La conversión también queda dentro del bloque protegido de la interfaz.
+            # Para salas se acepta el formato "capacidad; equipamiento".
             rate = self._number(values["rate"].get(), "La tarifa")
             detail = values["detail"].get()
             if self.service_type.get() == "Sala":
@@ -176,6 +184,8 @@ class SoftwareFJApp(tk.Tk):
         values = self.reservation_vars
 
         def operation() -> None:
+            # Cada tipo de servicio necesita un parámetro diferente; esta decisión
+            # se toma en la interfaz y el dominio vuelve a validar antes de guardar.
             duration = self._number(values["duration"].get(), "La duración")
             discount = self._number(values["discount"].get() or "0", "El descuento")
             service = self.manager.services.get(values["service"].get())

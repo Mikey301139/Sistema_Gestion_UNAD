@@ -8,7 +8,7 @@ from typing import Any
 
 from .exceptions import DuplicateError, NotFoundError, ReservationError, SoftwareFJError
 from .models import Client
-from .reservation import Reservation
+from .reservation import Reservation, ReservationStatus
 from .services import EquipmentRentalService, RoomReservationService, Service, SpecializedConsultingService
 
 
@@ -37,10 +37,13 @@ class SoftwareFJManager:
         self.logger.info("Aplicación iniciada.")
 
     def _add_unique(self, collection: dict[str, Any], identifier: str, entity: Any, label: str) -> None:
-        if identifier in collection:
-            raise DuplicateError(f"Ya existe {label} con identificador '{identifier}'.")
-        collection[identifier] = entity
-        self.logger.info("%s registrado: %s", label.capitalize(), identifier)
+        # Se usa el identificador normalizado de la entidad para evitar duplicados
+        # como "CLI-01" y " CLI-01 ".
+        normalized_identifier = getattr(entity, "identifier", identifier)
+        if normalized_identifier in collection:
+            raise DuplicateError(f"Ya existe {label} con identificador '{normalized_identifier}'.")
+        collection[normalized_identifier] = entity
+        self.logger.info("%s registrado: %s", label.capitalize(), normalized_identifier)
 
     def register_client(self, identifier: str, name: str, email: str, phone: str) -> Client:
         client = Client(identifier, name, email, phone)
@@ -63,15 +66,16 @@ class SoftwareFJManager:
         return service
 
     def create_reservation(self, identifier: str, client_id: str, service_id: str, duration: float, discount: float = 0.0, **parameters: Any) -> Reservation:
-        if identifier in self.reservations:
-            raise DuplicateError(f"Ya existe una reserva con identificador '{identifier}'.")
         try:
+            # Búsqueda explícita en memoria: el proyecto no utiliza base de datos.
             client = self.clients[client_id]
             service = self.services[service_id]
         except KeyError as error:
             self.logger.exception("Entidad requerida no encontrada al crear la reserva.")
             raise NotFoundError(f"No existe el identificador '{error.args[0]}'.") from error
         reservation = Reservation(identifier, client, service, duration, **parameters)
+        if reservation.identifier in self.reservations:
+            raise DuplicateError(f"Ya existe una reserva con identificador '{reservation.identifier}'.")
         try:
             reservation.process(discount=float(discount))
         except (SoftwareFJError, ValueError, TypeError) as error:
@@ -109,9 +113,10 @@ class SoftwareFJManager:
         self.register_consulting("ASE-01", "Asesoría de software", 150000, "Arquitectura y desarrollo")
 
     def summary(self) -> dict[str, int]:
+        """Resume el estado actual para la interfaz y la salida por consola."""
         return {
             "clientes": len(self.clients),
             "servicios": len(self.services),
             "reservas": len(self.reservations),
-            "confirmadas": sum(r.status.value == "Confirmada" for r in self.reservations.values()),
+            "confirmadas": sum(r.status == ReservationStatus.CONFIRMED for r in self.reservations.values()),
         }

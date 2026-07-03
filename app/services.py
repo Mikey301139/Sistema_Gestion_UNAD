@@ -10,7 +10,11 @@ from .models import Entity
 
 
 class Service(Entity, ABC):
-    """Contrato abstracto que deben cumplir todos los servicios."""
+    """Contrato abstracto que deben cumplir todos los servicios.
+
+    Las clases hijas cambian la forma de validar y calcular costos. Esa variación
+    es el uso principal de polimorfismo en la solución.
+    """
 
     def __init__(self, identifier: str, name: str, base_rate: float, available: bool = True) -> None:
         super().__init__(identifier)
@@ -35,8 +39,13 @@ class Service(Entity, ABC):
         self._available = bool(available)
 
     def ensure_available(self) -> None:
+        """Impide reservar servicios deshabilitados."""
         if not self.available:
             raise ServiceUnavailableError(f"El servicio '{self.name}' no está disponible.")
+
+    def display_name(self) -> str:
+        """Nombre común usado por la interfaz, consola y reportes."""
+        return self.name
 
     @abstractmethod
     def calculate_cost(self, duration: float, **parameters: Any) -> float:
@@ -73,7 +82,10 @@ class RoomReservationService(Service):
         self.equipment = equipment.strip() or "Equipamiento básico"
 
     def validate_parameters(self, duration: float, **parameters: Any) -> None:
-        attendees = int(parameters.get("attendees", 1))
+        try:
+            attendees = int(parameters.get("attendees", 1))
+        except (TypeError, ValueError) as error:
+            raise ValidationError("La cantidad de asistentes debe ser numérica.") from error
         if duration <= 0:
             raise ValidationError("La duración debe ser mayor que cero.")
         if attendees < 1 or attendees > self.capacity:
@@ -86,6 +98,9 @@ class RoomReservationService(Service):
     def describe(self) -> str:
         return f"Sala: {self.name} | capacidad: {self.capacity} | {self.equipment}"
 
+    def __str__(self) -> str:
+        return f"{self.identifier} - {self.describe()} - tarifa base ${self._base_rate:,.0f}"
+
 
 class EquipmentRentalService(Service):
     """Servicio de alquiler de equipos por días y unidades."""
@@ -97,7 +112,10 @@ class EquipmentRentalService(Service):
         self.stock = stock
 
     def validate_parameters(self, duration: float, **parameters: Any) -> None:
-        units = int(parameters.get("units", 1))
+        try:
+            units = int(parameters.get("units", 1))
+        except (TypeError, ValueError) as error:
+            raise ValidationError("La cantidad de unidades debe ser numérica.") from error
         if duration <= 0:
             raise ValidationError("Los días de alquiler deben ser mayores que cero.")
         if units < 1 or units > self.stock:
@@ -105,10 +123,14 @@ class EquipmentRentalService(Service):
 
     def calculate_cost(self, duration: float, **parameters: Any) -> float:
         self.validate_parameters(duration, **parameters)
-        return round(self._base_rate * duration * int(parameters.get("units", 1)), 2)
+        units = int(parameters.get("units", 1))
+        return round(self._base_rate * duration * units, 2)
 
     def describe(self) -> str:
         return f"Equipo: {self.name} | unidades disponibles: {self.stock}"
+
+    def __str__(self) -> str:
+        return f"{self.identifier} - {self.describe()} - tarifa base ${self._base_rate:,.0f}"
 
 
 class SpecializedConsultingService(Service):
@@ -130,3 +152,6 @@ class SpecializedConsultingService(Service):
 
     def describe(self) -> str:
         return f"Asesoría: {self.name} | especialidad: {self.specialty}"
+
+    def __str__(self) -> str:
+        return f"{self.identifier} - {self.describe()} - tarifa base ${self._base_rate:,.0f}"

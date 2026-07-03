@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from re import fullmatch
 
 from .exceptions import ValidationError
 
 
 class Entity(ABC):
-    """Abstracción común para las entidades identificables del sistema."""
+    """Abstracción común para todas las entidades identificables del sistema.
+
+    Esta clase representa el principio de abstracción: cliente, servicio y reserva
+    comparten un identificador, pero cada una define su propia forma de presentarse.
+    """
 
     def __init__(self, identifier: str) -> None:
         if not identifier or not identifier.strip():
@@ -21,9 +25,17 @@ class Entity(ABC):
         """Entrega el identificador sin permitir modificarlo desde fuera."""
         return self._identifier
 
+    @abstractmethod
+    def display_name(self) -> str:
+        """Devuelve un nombre legible de la entidad para consola o interfaz."""
+
 
 class Client(Entity):
-    """Cliente con datos privados y validados mediante propiedades."""
+    """Cliente con datos privados y validados mediante propiedades.
+
+    Los atributos se almacenan con guion bajo y se modifican mediante setters para
+    aplicar encapsulamiento y evitar que entren datos inválidos al sistema.
+    """
 
     def __init__(self, identifier: str, name: str, email: str, phone: str) -> None:
         super().__init__(identifier)
@@ -65,3 +77,6 @@ class Client(Entity):
 
     def __str__(self) -> str:
         return f"{self.identifier} - {self.name}"
+
+    def display_name(self) -> str:
+        return self.name

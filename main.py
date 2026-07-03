@@ -1,7 +1,11 @@
 """Punto de entrada de la aplicación.
 
-Integrantes del equipo (reemplazar antes de entregar):
-- David Santiago Acosta Garcia
+Integrantes del equipo (reemplazar estos datos antes de entregar):
+- [Nombre completo del integrante 1]
+- [Nombre completo del integrante 2]
+- [Nombre completo del integrante 3]
+- [Nombre completo del integrante 4]
+- [Nombre completo del integrante 5]
 """
 
 from app.gui import SoftwareFJApp
@@ -16,6 +20,7 @@ def main() -> None:
     app.mainloop()
 
 
+# Condición de entrada correcta en Python:
+# solo ejecuta la interfaz cuando este archivo se abre directamente.
 if __name__ == "__main__":
     main()
-    

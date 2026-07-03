@@ -19,7 +19,11 @@ class ReservationStatus(str, Enum):
 
 
 class Reservation(Entity):
-    """Relaciona cliente, servicio, duración, datos específicos y estado."""
+    """Relaciona cliente, servicio, duración, datos específicos y estado.
+
+    La reserva concentra el ciclo de vida del proceso: inicia pendiente, se confirma
+    al calcular el total correctamente y puede cancelarse una sola vez.
+    """
 
     def __init__(self, identifier: str, client: Client, service: Service, duration: float, **parameters: Any) -> None:
         super().__init__(identifier)
@@ -45,3 +49,13 @@ class Reservation(Entity):
         if self.status == ReservationStatus.CANCELLED:
             raise ReservationError("La reserva ya se encuentra cancelada.")
         self.status = ReservationStatus.CANCELLED
+
+    def display_name(self) -> str:
+        return f"Reserva {self.identifier}"
+
+    def __str__(self) -> str:
+        return (
+            f"{self.identifier} - cliente: {self.client.display_name()} - "
+            f"servicio: {self.service.display_name()} - estado: {self.status.value} - "
+            f"total: ${self.total:,.0f}"
+        )

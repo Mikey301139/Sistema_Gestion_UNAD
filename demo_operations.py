@@ -1,29 +1,51 @@
 """Demostración secuencial de operaciones válidas e inválidas sin abrir Tkinter.
 
-Integrantes del equipo (reemplazar antes de entregar):
+Nombre del estudinate:
 - David Santiago Acosta Garcia
+
 """
+
+import logging
+from collections.abc import Callable
+from typing import Any
 
 from app.exceptions import SoftwareFJError
 from app.manager import SoftwareFJManager
 
+logger = logging.getLogger("software_fj")
 
-def execute(number: int, description: str, operation) -> None:
-    """Ejecuta una operación, evidencia los errores esperados y continúa."""
+
+def execute(number: int, description: str, operation: Callable[[], Any]) -> None:
+    """Ejecuta una operación y muestra un resultado legible para la revisión.
+
+    La demostración no se detiene cuando aparece un error controlado. Esto permite
+    evidenciar que el sistema valida datos inválidos, registra el evento y continúa
+    procesando los demás casos, tal como solicita la actividad.
+    """
     try:
         result = operation()
     except SoftwareFJError as error:
         # Se conserva evidencia del error, incluso en las operaciones de demostración.
-        __import__("logging").getLogger("software_fj").error("Caso %s falló de forma controlada: %s", number, error)
-        print(f"{number:02}. CONTROLADO | {description}: {error}")
+        logger.error("Caso %s falló de forma controlada: %s", number, error)
+        print(f"{number:02} | CONTROLADO | {description:<38} | {error}")
     else:
-        value = f" -> {result}" if result is not None else ""
-        print(f"{number:02}. OK         | {description}{value}")
+        detail = str(result) if result is not None else "Operación ejecutada correctamente"
+        print(f"{number:02} | OK         | {description:<38} | {detail}")
+
+
+def print_header() -> None:
+    """Imprime una cabecera para que la salida de consola sea fácil de leer."""
+    print("=" * 110)
+    print("DEMOSTRACIÓN SECUENCIAL - SISTEMA INTEGRAL SOFTWARE FJ")
+    print("=" * 110)
+    print("No | Estado     | Operación                              | Resultado")
+    print("-" * 110)
 
 
 def main() -> None:
     """Ejecuta más de diez casos requeridos y mantiene la ejecución activa."""
     manager = SoftwareFJManager()
+    print_header()
     execute(1, "Crear sala válida", lambda: manager.register_room("SAL-01", "Sala Innovación", 85000, 20, "Video beam"))
     execute(2, "Crear equipo válido", lambda: manager.register_equipment("EQU-01", "Portátil empresarial", 120000, 8))
     execute(3, "Crear asesoría válida", lambda: manager.register_consulting("ASE-01", "Asesoría de software", 150000, "Arquitectura"))
@@ -37,8 +59,9 @@ def main() -> None:
     execute(11, "Reservar un servicio no disponible", lambda: manager.create_reservation("RES-04", "CC-100", "ASE-01", 1))
     execute(12, "Cancelar reserva", lambda: manager.cancel_reservation("RES-01"))
     execute(13, "Cancelar de nuevo", lambda: manager.cancel_reservation("RES-01"))
-    print("\nResumen final:", manager.summary())
-    print("Revise logs/software_fj.log para el registro de eventos y errores.")
+    print("-" * 110)
+    print(f"Resumen final: {manager.summary()}")
+    print("Registro de eventos y errores: logs/software_fj.log")
 
 
 if __name__ == "__main__":
