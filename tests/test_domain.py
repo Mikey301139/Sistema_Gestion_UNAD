@@ -15,24 +15,29 @@ class SoftwareFJDomainTests(unittest.TestCase):
         self.manager.register_client("CLI-01", "María López", "maria@example.com", "3001234567")
 
     def test_confirmed_room_reservation_includes_tax(self) -> None:
+        # 85000 * 2 horas = 170000; con 19% de impuesto: 202300.
         reservation = self.manager.create_reservation("RES-01", "CLI-01", "SAL-01", 2, attendees=5)
         self.assertEqual(reservation.status.value, "Confirmada")
         self.assertEqual(reservation.total, 202300.0)
 
     def test_invalid_equipment_does_not_store_reservation(self) -> None:
+        # Pedir 99 unidades de un stock de 8 debe fallar y no dejar rastro en memoria.
         with self.assertRaises(ReservationError):
             self.manager.create_reservation("RES-02", "CLI-01", "EQU-01", 1, units=99)
         self.assertNotIn("RES-02", self.manager.reservations)
 
     def test_invalid_client_is_rejected(self) -> None:
+        # Nombre muy corto y correo con formato inválido deben ser rechazados.
         with self.assertRaises(ValidationError):
             self.manager.register_client("CLI-02", "X", "incorrecto", "12")
 
     def test_duplicate_client_is_rejected(self) -> None:
+        # No se permite reutilizar un identificador de cliente ya registrado.
         with self.assertRaises(DuplicateError):
             self.manager.register_client("CLI-01", "Otra Persona", "otra@example.com", "3000000000")
 
     def test_reservation_can_only_be_cancelled_once(self) -> None:
+        # Verifica que cancelar dos veces la misma reserva sea un error controlado.
         self.manager.create_reservation("RES-03", "CLI-01", "ASE-01", 2)
         self.manager.cancel_reservation("RES-03")
         with self.assertRaises(ReservationError):

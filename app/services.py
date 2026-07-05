@@ -22,6 +22,8 @@ class Service(Entity, ABC):
             raise ValidationError("El nombre del servicio es obligatorio.")
         if base_rate <= 0:
             raise ValidationError("La tarifa base debe ser mayor que cero.")
+        # Atributos protegidos: solo se exponen mediante las propiedades de abajo,
+        # así ninguna clase externa puede dejar el servicio en un estado inválido.
         self._name = name.strip()
         self._base_rate = float(base_rate)
         self._available = bool(available)
@@ -47,6 +49,9 @@ class Service(Entity, ABC):
         """Nombre común usado por la interfaz, consola y reportes."""
         return self.name
 
+    # Los tres métodos abstractos siguientes son el punto de extensión de la
+    # jerarquía: para agregar un nuevo tipo de servicio basta con crear una
+    # subclase que los implemente, sin modificar Service ni el resto del sistema.
     @abstractmethod
     def calculate_cost(self, duration: float, **parameters: Any) -> float:
         """Calcula el costo particular del servicio."""
@@ -67,6 +72,8 @@ class Service(Entity, ABC):
         """
         if not 0 <= tax_rate <= 1 or not 0 <= discount <= 1:
             raise ValidationError("Impuesto y descuento deben estar entre 0 y 1.")
+        # calculate_cost() es polimórfico: cada subclase decide cómo se calcula
+        # el costo base antes de aplicarle impuesto y descuento aquí.
         base = self.calculate_cost(duration, **parameters)
         return round(base * (1 + tax_rate) * (1 - discount), 2)
 
@@ -79,9 +86,12 @@ class RoomReservationService(Service):
         if capacity <= 0:
             raise ValidationError("La capacidad de la sala debe ser positiva.")
         self.capacity = capacity
+        # Si no se indica equipamiento, se asume uno básico para no dejar el dato vacío.
         self.equipment = equipment.strip() or "Equipamiento básico"
 
     def validate_parameters(self, duration: float, **parameters: Any) -> None:
+        # Regla propia de la sala: la cantidad de asistentes nunca puede
+        # superar su capacidad física, por eso se valida contra self.capacity.
         try:
             attendees = int(parameters.get("attendees", 1))
         except (TypeError, ValueError) as error:
@@ -112,6 +122,8 @@ class EquipmentRentalService(Service):
         self.stock = stock
 
     def validate_parameters(self, duration: float, **parameters: Any) -> None:
+        # Regla propia del equipo: no se puede alquilar más unidades que
+        # las que hay en inventario (self.stock).
         try:
             units = int(parameters.get("units", 1))
         except (TypeError, ValueError) as error:
@@ -143,6 +155,8 @@ class SpecializedConsultingService(Service):
         self.specialty = specialty.strip()
 
     def validate_parameters(self, duration: float, **parameters: Any) -> None:
+        # La asesoría no recibe parámetros extra (a diferencia de sala y equipo),
+        # solo limita la duración máxima permitida por sesión.
         if duration <= 0 or duration > 40:
             raise ValidationError("La asesoría debe durar entre 0 y 40 horas.")
 

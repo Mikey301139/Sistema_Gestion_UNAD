@@ -38,6 +38,8 @@ class Reservation(Entity):
         """Valida, calcula y confirma; conserva el objeto en estado consistente."""
         if self.status == ReservationStatus.CANCELLED:
             raise ReservationError("No se puede procesar una reserva cancelada.")
+        # Si cualquiera de estas líneas lanza una excepción, el total y el
+        # estado no cambian: la reserva queda como estaba antes del intento.
         self.service.ensure_available()
         self.service.validate_parameters(self.duration, **self.parameters)
         self.total = self.service.calculate_total(self.duration, tax_rate, discount, **self.parameters)
@@ -46,6 +48,7 @@ class Reservation(Entity):
 
     def cancel(self) -> None:
         """Cancela una reserva pendiente o confirmada una única vez."""
+        # Una reserva cancelada es un estado final: no se permite cancelarla otra vez.
         if self.status == ReservationStatus.CANCELLED:
             raise ReservationError("La reserva ya se encuentra cancelada.")
         self.status = ReservationStatus.CANCELLED

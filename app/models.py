@@ -16,6 +16,8 @@ class Entity(ABC):
     """
 
     def __init__(self, identifier: str) -> None:
+        # Se valida y normaliza el identificador aquí porque todas las
+        # subclases (Client, Service, Reservation) lo necesitan igual.
         if not identifier or not identifier.strip():
             raise ValidationError("El identificador es obligatorio.")
         self._identifier = identifier.strip()
@@ -49,6 +51,8 @@ class Client(Entity):
 
     @name.setter
     def name(self, value: str) -> None:
+        # El setter es el único punto de entrada para modificar el nombre,
+        # así se garantiza encapsulamiento: nunca se guarda un valor inválido.
         if not value or len(value.strip()) < 3:
             raise ValidationError("El nombre debe tener al menos 3 caracteres.")
         self._name = value.strip().title()
@@ -59,6 +63,7 @@ class Client(Entity):
 
     @email.setter
     def email(self, value: str) -> None:
+        # Expresión regular simple: exige un usuario, un @ y un dominio con punto.
         pattern = r"[^@\s]+@[^@\s]+\.[^@\s]+"
         if not value or not fullmatch(pattern, value.strip()):
             raise ValidationError("El correo electrónico no tiene un formato válido.")
@@ -70,6 +75,7 @@ class Client(Entity):
 
     @phone.setter
     def phone(self, value: str) -> None:
+        # Se aceptan espacios y guiones en la entrada, pero se guardan solo dígitos.
         normalized = value.strip().replace(" ", "").replace("-", "")
         if not normalized.isdigit() or not 7 <= len(normalized) <= 15:
             raise ValidationError("El teléfono debe contener entre 7 y 15 dígitos.")

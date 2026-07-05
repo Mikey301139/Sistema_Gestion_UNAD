@@ -1,5 +1,9 @@
 """Excepciones de dominio para comunicar errores controlados a la interfaz."""
 
+# Todas las excepciones propias heredan de SoftwareFJError. Así, tanto la GUI
+# como demo_operations.py pueden capturar un solo tipo base y mostrar el
+# mensaje al usuario sin distinguir manualmente cada subclase.
+
 
 class SoftwareFJError(Exception):
     """Clase base de los errores previsibles del sistema."""
