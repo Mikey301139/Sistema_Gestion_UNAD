@@ -1,4 +1,4 @@
-# Sistema Integral de Gestión - Software FJ
+# Sistema de Gestión Software FJ - UNAD
 
 Trabajo individual desarrollado para la Fase 4 del curso de Programación.
 
@@ -6,43 +6,56 @@ Trabajo individual desarrollado para la Fase 4 del curso de Programación.
 
 - David Santiago Acosta Garcia
 
-## Descripción del proyecto
+## Descripción
 
-Esta aplicación permite gestionar clientes, servicios y reservas para la empresa Software FJ. El sistema fue desarrollado en Python aplicando programación orientada a objetos y utilizando Tkinter para la interfaz gráfica.
+Aplicación de escritorio desarrollada en Python con Tkinter para gestionar clientes, servicios y reservas de la empresa Software FJ. El sistema trabaja en memoria, sin base de datos, y registra eventos y errores en archivos de log.
 
-La información se maneja en memoria durante la ejecución del programa, es decir, no se usa base de datos. Los eventos y errores controlados se registran en el archivo de log generado por la aplicación.
+## Correcciones realizadas según observación del tutor
 
-## Funcionalidades principales
+Se aplicaron correcciones concretas de calidad y ejecución:
 
-- Registro de clientes con validación de nombre, correo e identificación.
-- Creación de servicios de tres tipos:
-  - reserva de salas;
-  - alquiler de equipos;
-  - asesoría especializada.
-- Creación y confirmación de reservas.
+- Se corrigió y verificó la condición de entrada principal:
+
+```python
+if __name__ == "__main__":
+    main()
+```
+
+- Se eliminaron importaciones dinámicas innecesarias como `__import__(...)`.
+- Se mejoró la salida por consola de `demo_operations.py` con formato tabular.
+- Se agregaron estados claros para cada operación: `OK`, `CONTROLADO` y `ERROR`.
+- Se agregó resumen final de clientes, servicios y reservas.
+- Se reforzó la documentación interna mediante comentarios y docstrings.
+- Se mantuvo separación modular entre interfaz, lógica de negocio, modelos, reservas, servicios, excepciones y pruebas.
+
+## Funcionalidades
+
+- Registro validado de clientes.
+- Creación de servicios de reserva de salas.
+- Creación de servicios de alquiler de equipos.
+- Creación de servicios de asesoría especializada.
+- Confirmación de reservas.
 - Cancelación de reservas.
 - Cambio de disponibilidad de servicios.
 - Cálculo de costos con impuesto y descuento opcional.
-- Manejo de errores mediante excepciones personalizadas.
-- Registro de eventos y errores en archivo log.
-- Interfaz gráfica desarrollada con Tkinter.
-- Demostración secuencial por consola con operaciones válidas e inválidas.
+- Manejo de excepciones personalizadas.
+- Registro de eventos y errores en `logs/software_fj.log`.
+- Interfaz gráfica con Tkinter.
+- Simulación secuencial por consola.
 
-## Conceptos de programación aplicados
+## Principios de programación orientada a objetos
 
-El proyecto implementa los principios solicitados en la actividad:
-
-- Abstracción: uso de clases base abstractas para entidades y servicios.
-- Herencia: servicios especializados derivados de una clase general `Service`.
-- Polimorfismo: cada tipo de servicio calcula y valida su costo de forma diferente.
+- Abstracción: clases base para entidades y servicios.
+- Herencia: servicios especializados derivados de `Service`.
+- Polimorfismo: cada servicio valida y calcula costos de forma diferente.
 - Encapsulamiento: atributos protegidos y acceso mediante propiedades.
-- Manejo avanzado de excepciones: excepciones propias, bloques `try/except/else/finally` y registro de errores.
-- Modularidad: separación entre lógica de negocio, modelos, interfaz y pruebas.
+- Excepciones: errores personalizados y controlados.
+- Modularidad: archivos separados por responsabilidad.
 
-## Estructura del proyecto
+## Estructura
 
 ```text
-.
+Sistema_Gestion_UNAD/
 ├── app/
 │   ├── exceptions.py
 │   ├── gui.py
@@ -51,13 +64,9 @@ El proyecto implementa los principios solicitados en la actividad:
 │   ├── reservation.py
 │   └── services.py
 ├── docs/
-│   ├── analisis_requerimientos.md
-│   └── plantilla_informe.md
+├── logs/
 ├── outputs/
-│   ├── CORRECCIONES_TUTOR.md
-│   └── INSTRUCCIONES_DE_ENTREGA.md
 ├── tests/
-│   └── test_domain.py
 ├── demo_operations.py
 ├── main.py
 ├── README.md
@@ -67,61 +76,61 @@ El proyecto implementa los principios solicitados en la actividad:
 ## Requisitos
 
 - Python 3.10 o superior.
-- Tkinter incluido en la instalación estándar de Python para Windows.
+- Tkinter incluido con Python.
 
 No se requieren librerías externas.
 
-## Cómo ejecutar la aplicación gráfica
+## Ejecutar la interfaz gráfica
 
-Abrir PowerShell en la carpeta del proyecto y ejecutar:
+Desde PowerShell, dentro de la carpeta del proyecto:
 
 ```powershell
 python main.py
 ```
 
-Si el comando `python` no funciona, en este equipo se puede usar la ruta directa encontrada:
+Si el comando `python` no funciona, usar la ruta directa encontrada en este equipo:
 
 ```powershell
 & "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" main.py
 ```
 
-## Cómo ejecutar la demostración por consola
-
-La demostración ejecuta más de diez operaciones, incluyendo casos correctos y errores controlados:
+## Ejecutar demostración por consola
 
 ```powershell
 python demo_operations.py
 ```
 
-O con la ruta directa:
+O con ruta directa:
 
 ```powershell
 & "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" demo_operations.py
 ```
 
-## Cómo ejecutar las pruebas
+## Ejecutar pruebas
 
 ```powershell
 python -m unittest discover -v
 ```
 
-O con la ruta directa:
+O con ruta directa:
 
 ```powershell
 & "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" -m unittest discover -v
 ```
 
-## Evidencia de validación
+## GitHub individual
 
-Durante la revisión se validó:
+Para subir el proyecto a un repositorio personal:
 
-- ejecución de la demostración por consola;
-- ejecución de pruebas unitarias;
-- compilación de sintaxis de los archivos Python.
-
-Resultado de pruebas:
-
-```text
-Ran 5 tests
-OK
+```powershell
+git init
+git add .
+git commit -m "Entrega fase 4 sistema gestion Software FJ"
+git branch -M main
+git remote add origin https://github.com/USUARIO/NOMBRE_REPOSITORIO.git
+git push -u origin main
 ```
+
+## Nota
+
+Antes de entregar, verificar que `main.py`, `demo_operations.py` y las pruebas funcionen correctamente. También incluir el enlace del repositorio GitHub en el informe final.

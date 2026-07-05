@@ -1,32 +1,50 @@
-# Entrega preparada — Fase 4, Programación 213023
+# Instrucciones de entrega - Trabajo individual
 
-El proyecto funcional se encuentra en la carpeta principal del espacio de trabajo. Antes de entregarlo:
+Proyecto ubicado en:
 
-1. Reemplacen los cinco marcadores de integrantes en `main.py`, `demo_operations.py` y `README.md`.
-2. Ejecuten `python main.py` para mostrar la interfaz Tkinter.
-3. Ejecuten `python demo_operations.py` y tomen una captura de la evidencia de las 13 operaciones.
-4. Ejecuten `python -m unittest discover -v` y tomen una captura de las pruebas.
-5. Suban el proyecto a GitHub, agreguen a todos los integrantes como colaboradores y peguen el enlace en `docs/plantilla_informe.md`.
-6. Completen la portada, conclusiones y participación real de cada integrante; luego exporten la plantilla como PDF.
+`C:\Users\USUARIO\Desktop\Sistema_Gestion_UNAD`
 
-La aplicación no usa base de datos. Los eventos y errores se guardan durante la ejecución en `logs/software_fj.log`.
+## Estudiante
 
-## Nota de validación en este equipo
+- David Santiago Acosta Garcia
 
-El comando `python` no está disponible en la variable PATH, pero se encontró un
-intérprete instalado en:
+## Antes de entregar
+
+1. Abrir la carpeta `Sistema_Gestion_UNAD` en Visual Studio Code.
+2. Ejecutar la interfaz gráfica:
 
 ```powershell
-C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe
+& "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" main.py
 ```
 
-Con esa ruta se validó correctamente:
+3. Ejecutar la demostración por consola y tomar captura:
 
 ```powershell
 & "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" demo_operations.py
-& "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" -m unittest discover -v
-& "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" -m compileall .
 ```
 
-Resultado: las 5 pruebas unitarias pasaron y la compilación de sintaxis terminó
-sin errores.
+4. Ejecutar las pruebas unitarias y tomar captura:
+
+```powershell
+& "C:\Users\USUARIO\AppData\Local\Programs\Python\Python314\python.exe" -m unittest discover -v
+```
+
+5. Subir el proyecto a GitHub personal.
+6. Copiar el enlace del repositorio en el informe final.
+7. Exportar el informe como PDF.
+
+## Validación realizada
+
+Se validó directamente desde la carpeta del Escritorio:
+
+- `demo_operations.py`: ejecución correcta con 13 operaciones.
+- `python -m unittest discover -v`: 5 pruebas aprobadas.
+- `python -m compileall .`: compilación sin errores de sintaxis.
+
+## Correcciones importantes
+
+- Entrada principal corregida en `main.py`.
+- Eliminadas importaciones dinámicas innecesarias.
+- Salida de consola mejorada en formato tabular.
+- README actualizado para trabajo individual.
+- Informe de correcciones agregado en `outputs/CORRECCIONES_TUTOR.md`.

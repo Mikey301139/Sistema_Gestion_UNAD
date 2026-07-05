@@ -1,11 +1,11 @@
-"""Punto de entrada de la aplicación.
+"""Punto de entrada principal del Sistema de Gestión Software FJ.
 
-Integrantes del equipo (reemplazar estos datos antes de entregar):
-- [Nombre completo del integrante 1]
-- [Nombre completo del integrante 2]
-- [Nombre completo del integrante 3]
-- [Nombre completo del integrante 4]
-- [Nombre completo del integrante 5]
+Estudiante:
+- David Santiago Acosta Garcia
+
+Este archivo corrige la condición de entrada principal del programa. La aplicación
+solo se abre cuando se ejecuta directamente este módulo, evitando errores al
+importarlo desde pruebas u otros archivos.
 """
 
 from app.gui import SoftwareFJApp
@@ -13,14 +13,12 @@ from app.manager import SoftwareFJManager
 
 
 def main() -> None:
-    """Crea la sesión en memoria, carga ejemplos y abre Tkinter."""
+    """Inicializa los datos en memoria y abre la interfaz gráfica Tkinter."""
     manager = SoftwareFJManager()
     manager.load_initial_data()
     app = SoftwareFJApp(manager)
     app.mainloop()
 
 
-# Condición de entrada correcta en Python:
-# solo ejecuta la interfaz cuando este archivo se abre directamente.
 if __name__ == "__main__":
     main()
