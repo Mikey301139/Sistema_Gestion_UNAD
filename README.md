@@ -130,7 +130,3 @@ git branch -M main
 git remote add origin https://github.com/USUARIO/NOMBRE_REPOSITORIO.git
 git push -u origin main
 ```
-
-## Nota
-
-Antes de entregar, verificar que `main.py`, `demo_operations.py` y las pruebas funcionen correctamente. También incluir el enlace del repositorio GitHub en el informe final.
